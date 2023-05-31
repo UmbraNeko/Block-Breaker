@@ -170,7 +170,8 @@ def GAME(level):
   
     blockWidth, blockHeight = 40, 15
     horizontalGap, verticalGap = 20, 20
-    
+    if level == 0:
+        listOfBlocks = populateBlocks(0, blockWidth, blockHeight, horizontalGap, verticalGap)
     if level == 1:
         listOfBlocks = populateBlocks(1, blockWidth, blockHeight, horizontalGap, verticalGap)
     if level == 2:
@@ -187,14 +188,9 @@ def GAME(level):
         scoreText = get_font(20).render("Score : " + str(score), True, WHITE)
         livesText = get_font(20).render("Lives : " + str(lives), True, WHITE)
   
-        # If all the blocks are destroyed, then we repopulate them
+        # If all the blocks are destroyed, the Victory() function is called
         if not listOfBlocks:
-            if level == 1:
-                listOfBlocks = populateBlocks(1, blockWidth, blockHeight, horizontalGap, verticalGap)
-            if level == 2:
-                listOfBlocks = populateBlocks(2, blockWidth, blockHeight, horizontalGap, verticalGap)
-            if level == 3:
-                listOfBlocks = populateBlocks(3, blockWidth, blockHeight, horizontalGap, verticalGap)
+            Victory(level, score)
     
   
         # All the lives are over. So, the gameOver() function is called
@@ -259,6 +255,7 @@ def GAME(level):
   
         pygame.display.update()
         clock.tick(FPS)
+    
 
 def get_font(size):
     return pygame.font.Font("assets/font.ttf", size)
@@ -271,6 +268,12 @@ def populateBlocks(level, blockWidth, blockHeight,
                    horizontalGap, verticalGap):
     listOfBlocks = []
     
+    #test level
+    if level == 0:
+        listOfBlocks.append(Block(1280-(40*20-40+220), 15*21+100, blockWidth, blockHeight, 
+                GREEN))
+        return listOfBlocks
+        
     if level == 1:
 
         for i in range(1, 21):
@@ -449,13 +452,17 @@ def play():
         PLAY_RECT = PLAY_TEXT.get_rect(center=(640, 50))
         SCREEN.blit(PLAY_TEXT, PLAY_RECT)
 
-        PLAY_LEVEL_1 = Button(image=None, pos=(640, 200), 
+        PLAY_LEVEL_0 = Button(image=None, pos=(640, 150), 
+                            text_input="LEVEL 0", font=get_font(45), base_color="White", hovering_color="Green")
+        PLAY_LEVEL_1 = Button(image=None, pos=(640, 250), 
                             text_input="LEVEL 1", font=get_font(45), base_color="White", hovering_color="Green")
-        PLAY_LEVEL_2 = Button(image=None, pos=(640, 300), 
+        PLAY_LEVEL_2 = Button(image=None, pos=(640, 350), 
                             text_input="LEVEL 2", font=get_font(45), base_color="White", hovering_color="Green")
-        PLAY_LEVEL_3 = Button(image=None, pos=(640, 400), 
+        PLAY_LEVEL_3 = Button(image=None, pos=(640, 450), 
                             text_input="LEVEL 3", font=get_font(45), base_color="White", hovering_color="Green")
-
+        
+        PLAY_LEVEL_0.changeColor(PLAY_MOUSE_POS)
+        PLAY_LEVEL_0.update(SCREEN)
         PLAY_LEVEL_1.changeColor(PLAY_MOUSE_POS)
         PLAY_LEVEL_1.update(SCREEN)
         PLAY_LEVEL_2.changeColor(PLAY_MOUSE_POS)
@@ -475,6 +482,10 @@ def play():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if PLAY_LEVEL_0.checkForInput(PLAY_MOUSE_POS):
+                    s_level_select.stop()
+                    s_keydowm.play()
+                    GAME(0)
                 if PLAY_LEVEL_1.checkForInput(PLAY_MOUSE_POS):
                     s_level_select.stop()
                     s_keydowm.play()
@@ -595,3 +606,4 @@ def highscore_sort():
         file.write(content[i])
     file.close()                                                               
 main_menu()
+
